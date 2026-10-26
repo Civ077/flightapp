@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E4E79" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1B2A" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="機票查價">
+<title>機票查價 ✈</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="boot-error" class="booterr" hidden></div>
+<div id="app">
+
+  <!-- ══════════ 查價 Search ══════════ -->
+  <section class="view" id="view-search">
+    <header class="top"><h1 data-i18n="nav.search">✈ 查價</h1><span class="sub" id="quotaBadge"></span><button class="langbtn" id="btnLang" aria-label="Language">EN</button></header>
+
+    <div class="card setup" id="setupCard" hidden>
+      <h2 data-i18n="setup.title">首次使用：3 步驟完成設定</h2>
+      <ol class="steps">
+        <li data-i18n="setup.s1">把 backend/Code.gs 部署成 GAS 網頁應用程式（見 README）</li>
+        <li data-i18n="setup.s2">填入下方「後端網址」與「密碼」</li>
+        <li data-i18n="setup.s3">按「測試連線」，成功後即可查價</li>
+      </ol>
+      <label class="field"><span class="lbl" data-i18n="set.backend">後端網址（…/exec）</span><input type="url" id="quickBackend" placeholder="https://script.google.com/macros/s/…/exec" inputmode="url"></label>
+      <label class="field"><span class="lbl" data-i18n="set.token">密碼（APP_TOKEN）</span><input type="password" id="quickToken"></label>
+      <button class="primary" id="quickTest" data-i18n="set.test">測試連線</button>
+      <div class="hint" id="quickHint"></div>
+    </div>
+
+    <div class="card" id="searchCard">
+      <div class="seg" id="tripType">
+        <button data-v="rt" class="on" data-i18n="trip.rt">來回</button><button data-v="ow" data-i18n="trip.ow">單程</button>
+      </div>
+      <div class="seg sub" id="rtMode">
+        <button data-v="together" class="on" data-i18n="trip.together">來回票一起買</button><button data-v="split" data-i18n="trip.split">拆票：去回各一張</button>
+      </div>
+      <div class="row2">
+        <button class="field" id="btnOrigin"><span class="lbl" data-i18n="f.from">出發</span><span class="val" id="originVal">—</span><span class="val2" id="originSub"></span></button>
+        <button class="swap" id="btnSwap" aria-label="swap">⇄</button>
+        <button class="field" id="btnDest"><span class="lbl" data-i18n="f.to">抵達</span><span class="val" id="destVal">—</span><span class="val2" id="destSub"></span></button>
+      </div>
+      <div class="row2 dates">
+        <label class="field"><span class="lbl"><span data-i18n="f.dep">去程</span> <em id="depWk"></em></span><input type="date" id="depDate"></label>
+        <label class="field" id="retWrap"><span class="lbl"><span data-i18n="f.ret">回程</span> <em id="retWk"></em></span><input type="date" id="retDate"></label>
+      </div>
+      <div class="row2">
+        <button class="field" id="btnPax"><span class="lbl" data-i18n="f.pax">人數</span><span class="val" id="paxVal"></span></button>
+        <label class="field"><span class="lbl" data-i18n="f.cabin">艙等</span>
+          <select id="cabin"><option value="1" data-i18n="cabin.1">經濟艙</option><option value="2" data-i18n="cabin.2">豪華經濟艙</option><option value="3" data-i18n="cabin.3">商務艙</option><option value="4" data-i18n="cabin.4">頭等艙</option></select>
+        </label>
+      </div>
+      <details class="adv" id="adv">
+        <summary><span data-i18n="f.adv">進階條件</span> <span id="advSum" class="sub"></span></summary>
+        <label class="chk"><input type="checkbox" id="nonstop"> <span data-i18n="f.nonstop">只看直飛</span></label>
+        <label class="field"><span class="lbl" data-i18n="f.maxHours">最長總時程（小時，留空不限）</span><input type="number" id="maxHours" min="1" max="72" inputmode="numeric" data-i18n-ph="f.unlimited" placeholder="不限"></label>
+        <div class="lbl" data-i18n="f.include">只看這些航空公司（不選＝全部已啟用）</div>
+        <div class="chips" id="includeChips"></div>
+      </details>
+      <button class="primary" id="btnSearch">查價</button>
+      <div class="hint" id="searchHint"></div>
+    </div>
+
+    <div class="card soft" id="lastResultCard" hidden>
+      <div class="lbl" data-i18n="last.title">上次查價結果</div>
+      <div id="lastResultText"></div>
+      <div class="row2"><button class="secondary" id="btnShowLast" data-i18n="last.view">查看</button><button class="secondary" id="btnRedoLast" data-i18n="last.redo">重新查價</button></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 結果 Results ══════════ -->
+  <section class="view" id="view-results" hidden>
+    <header class="top">
+      <button class="back" id="btnBack" aria-label="back">‹</button>
+      <h1 id="resTitle"></h1>
+      <button class="icon" id="btnRefresh" aria-label="refresh">↻</button>
+      <button class="icon star" id="btnFav" aria-label="favorite">☆</button>
+    </header>
+    <div class="resmeta" id="resMeta"></div>
+    <div class="legbar" id="legBar" hidden></div>
+    <div class="combo" id="comboBox" hidden></div>
+    <div class="row2 tools">
+      <button class="secondary" id="btnDays" data-i18n="days.btn">前後 3 天比價</button>
+      <button class="secondary" id="btnNearby" data-i18n="nearby.btn">加查周邊機場</button>
+    </div>
+    <div class="daystrip" id="dayStrip" hidden></div>
+    <div class="filterbar" id="filterBar"></div>
+    <div class="pricestrip" id="priceStrip" hidden></div>
+    <div class="seg tabs" id="resTabs">
+      <button data-v="cheap" class="on" data-i18n="tab.cheap">最便宜</button><button data-v="best" data-i18n="tab.best">最推薦</button><button data-v="early" data-i18n="tab.early">最早抵達</button>
+    </div>
+    <div id="insights" class="insights" hidden></div>
+    <div id="resList" class="list"></div>
+    <div class="card soft">
+      <div class="lbl" data-i18n="res.gfl">查詢量大的功能用 Google Flights 看（不耗額度）</div>
+      <a class="link" id="lnkGrid" target="_blank" rel="noopener" data-i18n="res.grid">日期矩陣／價格圖 ↗</a>
+    </div>
+  </section>
+
+  <!-- ══════════ 緊急 Emergency ══════════ -->
+  <section class="view" id="view-emerg" hidden>
+    <header class="top"><h1 data-i18n="nav.emerg">⚡ 緊急搶票</h1></header>
+    <div class="card">
+      <div class="note" data-i18n="em.note">天災、取消時用：從「現在」起找最早能抵達的航班，不限航空公司。</div>
+      <div class="row2">
+        <button class="field" id="btnEOrigin"><span class="lbl" data-i18n="em.from">目前位置</span><span class="val" id="eOriginVal">—</span></button>
+        <button class="field" id="btnEDest"><span class="lbl" data-i18n="em.to">目的地</span><span class="val" id="eDestVal">—</span></button>
+      </div>
+      <label class="chk"><input type="checkbox" id="eNearby" checked> <span data-i18n="em.nearby">一併搜尋周邊機場（例如桃園＋松山）</span></label>
+      <label class="chk"><input type="checkbox" id="eTomorrow"> <span data-i18n="em.tomorrow">查明天（今天已無航班時）</span></label>
+      <button class="primary danger" id="btnEmerg" data-i18n="em.go">找最早抵達的航班</button>
+      <div class="hint" id="emergHint"></div>
+    </div>
+    <div class="card" id="fidsCard">
+      <div class="lbl" data-i18n="fids.title">台灣機場即時航班（TDX）</div>
+      <div class="row2">
+        <label class="field"><span class="lbl" data-i18n="fids.airport">機場</span><select id="fidsAp"></select></label>
+        <div class="seg" id="fidsDir" style="margin:0"><button data-v="dep" class="on" data-i18n="fids.dep">出境</button><button data-v="arr" data-i18n="fids.arr">入境</button></div>
+      </div>
+      <div class="row2"><input type="search" id="fidsFilter" data-i18n-ph="fids.filter" placeholder="篩選班號、航空公司或機場代碼" style="margin:0"><button class="secondary" id="btnFids" data-i18n="fids.load">載入</button></div>
+      <div class="hint" id="fidsHint"></div>
+      <div id="fidsList" class="fidslist"></div>
+    </div>
+    <div class="card">
+      <div class="lbl" data-i18n="em.links">航班動態與異常公告</div>
+      <div class="links" id="emergLinks"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 收藏 Favorites ══════════ -->
+  <section class="view" id="view-fav" hidden>
+    <header class="top"><h1 data-i18n="nav.fav">★ 收藏航線</h1><button class="icon" id="btnFavAll" aria-label="refresh all">↻</button></header>
+    <div class="hint" id="favHint" data-i18n="fav.hint">點航線帶入查價；↻ 依收藏時的條件重查全部（每條 1 次額度，30 分鐘內有快取不扣）。</div>
+    <div id="favList" class="list"></div>
+    <div class="empty" id="favEmpty" data-i18n="fav.empty">尚無收藏。查價結果頁按 ☆ 可加入。</div>
+  </section>
+
+  <!-- ══════════ 設定 Settings ══════════ -->
+  <section class="view" id="view-settings" hidden>
+    <header class="top"><h1 data-i18n="nav.settings">⚙ 設定</h1></header>
+
+    <details class="card" open id="secConn">
+      <summary data-i18n="set.conn">連線</summary>
+      <label class="field"><span class="lbl" data-i18n="set.backend">後端網址（GAS Web App …/exec）</span><input type="url" id="setBackend" placeholder="https://script.google.com/macros/s/…/exec" inputmode="url"></label>
+      <label class="field"><span class="lbl" data-i18n="set.token">密碼（APP_TOKEN）</span><input type="password" id="setToken"></label>
+      <label class="field"><span class="lbl" data-i18n="set.homepc">家中電腦網址（預留，有則優先直連）</span><input type="url" id="setHomePc" placeholder="https://xxxx.ts.net" inputmode="url"></label>
+      <label class="field"><span class="lbl" data-i18n="set.homeToken">家中電腦密碼</span><input type="password" id="setHomeToken"></label>
+      <div class="row2"><button class="secondary" id="btnTestConn" data-i18n="set.test">測試連線</button><button class="secondary" id="btnQuota" data-i18n="set.quota">查詢額度</button></div>
+      <div class="hint" id="connHint"></div>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.airlines">航空公司</summary>
+      <div class="row2">
+        <button class="secondary" data-air="all" data-i18n="al.all">全選</button><button class="secondary" data-air="tw" data-i18n="al.tw">只選國籍</button>
+        <button class="secondary" data-air="lcc" data-i18n="al.lcc">只選廉航</button><button class="secondary" data-air="none" data-i18n="al.none">全不選</button>
+      </div>
+      <div class="hint" data-i18n="al.hint">勾選＝查價時納入；取消勾選＝不查這家；「排除」＝永遠不顯示（含組合行程）。資料庫外的航空公司仍會顯示。</div>
+      <div id="airlineList" class="checklist"></div>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.airports">機場</summary>
+      <div class="hint" data-i18n="ap.hint">勾選的機場會排在選擇清單最前面（台灣機場預設啟用）。清單仍可搜尋全部機場。</div>
+      <input type="search" id="airportFilter" data-i18n-ph="ap.filter" placeholder="搜尋機場（中文、英文或代碼）">
+      <div id="airportList" class="checklist"></div>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.defaults">預設條件</summary>
+      <div class="row2">
+        <label class="field"><span class="lbl" data-i18n="set.defOrigin">預設出發機場</span><select id="setDefOrigin"></select></label>
+        <label class="field"><span class="lbl" data-i18n="set.currency">幣別</span><select id="setCurrency"><option>TWD</option><option>USD</option><option>JPY</option><option>HKD</option><option>EUR</option></select></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="setNonstop"> <span data-i18n="set.nonstop">新查價預設只看直飛</span></label>
+      <div class="row2">
+        <label class="field"><span class="lbl" data-i18n="set.minLayover">轉機少於幾分鐘要警示</span><input type="number" id="setMinLayover" value="60" min="30" max="180" inputmode="numeric"></label>
+        <label class="field"><span class="lbl" data-i18n="set.stale">結果超過幾小時提示重查</span><input type="number" id="setStaleHours" value="6" min="1" max="72" inputmode="numeric"></label>
+      </div>
+      <label class="field"><span class="lbl" data-i18n="set.cache">相同條件幾分鐘內直接用上次結果（省額度）</span><input type="number" id="setCacheMin" value="30" min="0" max="720" inputmode="numeric"></label>
+      <div class="lbl" data-i18n="set.weights">「最推薦」排序權重（數字越大越重要）</div>
+      <div class="row2">
+        <label class="field"><span class="lbl" data-i18n="w.price">價格</span><input type="number" id="wPrice" value="60" min="0" max="100" inputmode="numeric"></label>
+        <label class="field"><span class="lbl" data-i18n="w.time">時長</span><input type="number" id="wTime" value="30" min="0" max="100" inputmode="numeric"></label>
+        <label class="field"><span class="lbl" data-i18n="w.slot">紅眼</span><input type="number" id="wSlot" value="10" min="0" max="100" inputmode="numeric"></label>
+        <label class="field"><span class="lbl" data-i18n="w.stops">轉機</span><input type="number" id="wStops" value="10" min="0" max="100" inputmode="numeric"></label>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.fees">行李／選位費用（估算用）</summary>
+      <div class="hint" data-i18n="fees.hint">每人每航段金額（TWD）。結果頁選「含託運行李」時會加總顯示；留空＝視為已含或未知。傳統航空通常含一件託運，廉航請自行填官網價格。</div>
+      <div id="feeList" class="checklist"></div>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.display">顯示</summary>
+      <div class="row2">
+        <label class="field"><span class="lbl" data-i18n="set.lang">語言 / Language</span><select id="setLang"><option value="zh">繁體中文</option><option value="en">English</option></select></label>
+        <label class="field"><span class="lbl" data-i18n="set.theme">主題</span><select id="setTheme"><option value="auto" data-i18n="theme.auto">跟隨系統</option><option value="light" data-i18n="theme.light">淺色</option><option value="dark" data-i18n="theme.dark">深色</option></select></label>
+      </div>
+      <label class="field"><span class="lbl" data-i18n="set.font">字體大小</span><select id="setFont"><option value="s" data-i18n="font.s">小</option><option value="m" selected data-i18n="font.m">標準</option><option value="l" data-i18n="font.l">大</option></select></label>
+    </details>
+
+    <details class="card">
+      <summary data-i18n="set.data">資料</summary>
+      <div class="row2"><button class="secondary" id="btnExport" data-i18n="data.export">匯出設定</button><button class="secondary" id="btnImport" data-i18n="data.import">匯入設定</button></div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <div class="row2"><button class="secondary" id="btnClearCache" data-i18n="data.clearCache">清除查價快取</button><button class="secondary danger" id="btnClear" data-i18n="data.clearAll">清除所有資料</button></div>
+      <div class="hint" data-i18n="data.hint">資料只存在這支手機。iPhone 請用「加入主畫面」開啟，資料才不會被 Safari 自動清除。</div>
+      <div class="hint" id="verInfo"></div>
+    </details>
+  </section>
+
+  <!-- ══════════ 底部分頁 Tab bar ══════════ -->
+  <nav class="tabbar">
+    <button data-view="search" class="on"><span>✈</span><i data-i18n="tab.search">查價</i></button>
+    <button data-view="emerg"><span>⚡</span><i data-i18n="tab.emerg">緊急</i></button>
+    <button data-view="fav"><span>★</span><i data-i18n="tab.fav">收藏</i></button>
+    <button data-view="settings"><span>⚙</span><i data-i18n="tab.settings">設定</i></button>
+  </nav>
+
+  <!-- ══════════ 機場選擇 Airport picker ══════════ -->
+  <div class="sheet" id="sheetAirport" hidden>
+    <div class="sheet-body">
+      <header class="top"><button class="back" id="apClose" aria-label="close">‹</button><h1 id="apTitle"></h1></header>
+      <input type="search" id="apSearch" data-i18n-ph="ap.search" placeholder="輸入城市、機場名或代碼，例：東京 / Tokyo / NRT" autocomplete="off">
+      <div id="apList" class="aplist"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ 人數 Passengers ══════════ -->
+  <div class="sheet" id="sheetPax" hidden>
+    <div class="sheet-body small">
+      <h2 data-i18n="f.pax">人數</h2>
+      <div class="chips" id="paxPresets"></div>
+      <div class="stepper"><span data-i18n="pax.adults">成人（12 歲以上）</span><div><button data-p="adults" data-d="-1" aria-label="-">−</button><b id="nAdults">1</b><button data-p="adults" data-d="1" aria-label="+">＋</button></div></div>
+      <div class="stepper"><span data-i18n="pax.children">兒童（2–11 歲）</span><div><button data-p="children" data-d="-1" aria-label="-">−</button><b id="nChildren">0</b><button data-p="children" data-d="1" aria-label="+">＋</button></div></div>
+      <div class="stepper"><span data-i18n="pax.infants">嬰兒（未滿 2 歲，不佔位）</span><div><button data-p="infants" data-d="-1" aria-label="-">−</button><b id="nInfants">0</b><button data-p="infants" data-d="1" aria-label="+">＋</button></div></div>
+      <div class="hint" data-i18n="pax.hint">嬰兒人數不可多於成人。廉航的兒童與嬰兒費用與傳統航空不同，官網結帳時再確認。</div>
+      <div class="row2"><button class="secondary" id="paxSave" data-i18n="pax.save">儲存為常用組合</button><button class="primary" id="paxDone" data-i18n="done">完成</button></div>
+    </div>
+  </div>
+
+  <!-- ══════════ 訂票 Booking ══════════ -->
+  <div class="sheet" id="sheetBook" hidden>
+    <div class="sheet-body">
+      <header class="top"><button class="back" id="bkClose" aria-label="close">‹</button><h1 data-i18n="bk.title">前往官網訂票</h1></header>
+      <div id="bkBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <div class="loading" id="loading" hidden><div class="spin"></div><div id="loadingText"></div><button class="link" id="btnCancel" data-i18n="cancel">取消</button></div>
+</div>
+
+<script src="data/airports.js"></script>
+<script src="data/airlines.js"></script>
+<script src="data/holidays.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+// 航空公司資料庫：IATA 代碼、繁體中文名、英文名、類型（FSC 傳統／LCC 廉航）、官網、航班動態頁
+// 官網連結一律用首頁或訂票首頁（最穩定），不帶參數；日期與航班資訊由 App 一鍵複製後貼到官網
+window.AIRLINES = [
+  // ── 台灣 ──
+  {c:'CI',zh:'中華航空',en:'China Airlines',t:'FSC',co:'TW',site:'https://www.china-airlines.com/tw/zh',status:'https://www.china-airlines.com/tw/zh/fly/flight-status'},
+  {c:'BR',zh:'長榮航空',en:'EVA Air',t:'FSC',co:'TW',site:'https://www.evaair.com/zh-tw/index.html',status:'https://www.evaair.com/zh-tw/fly-prepare/flight-status/'},
+  {c:'JX',zh:'星宇航空',en:'STARLUX Airlines',t:'FSC',co:'TW',site:'https://www.starlux-airlines.com/zh-TW',status:'https://www.starlux-airlines.com/zh-TW/flight-status'},
+  {c:'IT',zh:'台灣虎航',en:'Tigerair Taiwan',t:'LCC',co:'TW',site:'https://www.tigerairtw.com/zh-tw',status:'https://www.tigerairtw.com/zh-tw/flight-status'},
+  {c:'AE',zh:'華信航空',en:'Mandarin Airlines',t:'FSC',co:'TW',site:'https://www.mandarin-airlines.com/',status:'https://www.mandarin-airlines.com/'},
+  {c:'B7',zh:'立榮航空',en:'UNI Air',t:'FSC',co:'TW',site:'https://www.uniair.com.tw/',status:'https://www.uniair.com.tw/'},
+  // ── 港澳 ──
+  {c:'CX',zh:'國泰航空',en:'Cathay Pacific',t:'FSC',co:'HK',site:'https://www.cathaypacific.com/cx/zh_TW.html',status:'https://www.cathaypacific.com/cx/zh_TW/manage-booking/flight-status.html'},
+  {c:'HX',zh:'香港航空',en:'Hong Kong Airlines',t:'FSC',co:'HK',site:'https://www.hongkongairlines.com/zh_TW/',status:'https://www.hongkongairlines.com/zh_TW/'},
+  {c:'UO',zh:'香港快運',en:'HK Express',t:'LCC',co:'HK',site:'https://www.hkexpress.com/zh-tw/',status:'https://www.hkexpress.com/zh-tw/'},
+  {c:'NX',zh:'澳門航空',en:'Air Macau',t:'FSC',co:'MO',site:'https://www.airmacau.com.mo/',status:'https://www.airmacau.com.mo/'},
+  // ── 日本 ──
+  {c:'JL',zh:'日本航空',en:'Japan Airlines',t:'FSC',co:'JP',site:'https://www.tw.jal.co.jp/twl/zhtw/',status:'https://www.jal.co.jp/en/'},
+  {c:'NH',zh:'全日空',en:'All Nippon Airways',t:'FSC',co:'JP',site:'https://www.ana.co.jp/zh/tw/',status:'https://www.ana.co.jp/zh/tw/'},
+  {c:'MM',zh:'樂桃航空',en:'Peach Aviation',t:'LCC',co:'JP',site:'https://www.flypeach.com/tw',status:'https://www.flypeach.com/tw'},
+  {c:'GK',zh:'捷星日本',en:'Jetstar Japan',t:'LCC',co:'JP',site:'https://www.jetstar.com/tw/zh',status:'https://www.jetstar.com/tw/zh'},
+  // ── 韓國 ──
+  {c:'KE',zh:'大韓航空',en:'Korean Air',t:'FSC',co:'KR',site:'https://www.koreanair.com/tw/zh',status:'https://www.koreanair.com/tw/zh'},
+  {c:'OZ',zh:'韓亞航空',en:'Asiana Airlines',t:'FSC',co:'KR',site:'https://flyasiana.com/C/TW/ZH/index',status:'https://flyasiana.com/C/TW/ZH/index'},
+  {c:'7C',zh:'濟州航空',en:'Jeju Air',t:'LCC',co:'KR',site:'https://www.jejuair.net/tw/zh/',status:'https://www.jejuair.net/tw/zh/'},
+  {c:'LJ',zh:'真航空',en:'Jin Air',t:'LCC',co:'KR',site:'https://www.jinair.com/',status:'https://www.jinair.com/'},
+  {c:'TW',zh:'德威航空',en:'T\'way Air',t:'LCC',co:'KR',site:'https://www.twayair.com/app/main',status:'https://www.twayair.com/app/main'},
+  {c:'BX',zh:'釜山航空',en:'Air Busan',t:'LCC',co:'KR',site:'https://www.airbusan.com/',status:'https://www.airbusan.com/'},
+  // ── 東南亞 ──
+  {c:'SQ',zh:'新加坡航空',en:'Singapore Airlines',t:'FSC',co:'SG',site:'https://www.singaporeair.com/zh_TW/tw/home',status:'https://www.singaporeair.com/zh_TW/tw/home'},
+  {c:'TR',zh:'酷航',en:'Scoot',t:'LCC',co:'SG',site:'https://www.flyscoot.com/zhtw',status:'https://www.flyscoot.com/zhtw'},
+  {c:'TG',zh:'泰國國際航空',en:'Thai Airways',t:'FSC',co:'TH',site:'https://www.thaiairways.com/zh_TW/index.page',status:'https://www.thaiairways.com/zh_TW/index.page'},
+  {c:'VZ',zh:'泰越捷航空',en:'Thai Vietjet Air',t:'LCC',co:'TH',site:'https://www.vietjetair.com/zh-TW',status:'https://www.vietjetair.com/zh-TW'},
+  {c:'FD',zh:'泰國亞洲航空',en:'Thai AirAsia',t:'LCC',co:'TH',site:'https://www.airasia.com/zh/tw',status:'https://www.airasia.com/zh/tw'},
+  {c:'XJ',zh:'泰國亞洲航空 X',en:'Thai AirAsia X',t:'LCC',co:'TH',site:'https://www.airasia.com/zh/tw',status:'https://www.airasia.com/zh/tw'},
+  {c:'MH',zh:'馬來西亞航空',en:'Malaysia Airlines',t:'FSC',co:'MY',site:'https://www.malaysiaairlines.com/tw/zh_TW.html',status:'https://www.malaysiaairlines.com/tw/zh_TW.html'},
+  {c:'AK',zh:'亞洲航空',en:'AirAsia',t:'LCC',co:'MY',site:'https://www.airasia.com/zh/tw',status:'https://www.airasia.com/zh/tw'},
+  {c:'D7',zh:'亞洲航空 X',en:'AirAsia X',t:'LCC',co:'MY',site:'https://www.airasia.com/zh/tw',status:'https://www.airasia.com/zh/tw'},
+  {c:'OD',zh:'馬印航空',en:'Batik Air Malaysia',t:'LCC',co:'MY',site:'https://www.batikair.com/',status:'https://www.batikair.com/'},
+  {c:'PR',zh:'菲律賓航空',en:'Philippine Airlines',t:'FSC',co:'PH',site:'https://www.philippineairlines.com/',status:'https://www.philippineairlines.com/'},
+  {c:'5J',zh:'宿霧太平洋航空',en:'Cebu Pacific',t:'LCC',co:'PH',site:'https://www.cebupacificair.com/',status:'https://www.cebupacificair.com/'},
+  {c:'Z2',zh:'菲律賓亞洲航空',en:'Philippines AirAsia',t:'LCC',co:'PH',site:'https://www.airasia.com/zh/tw',status:'https://www.airasia.com/zh/tw'},
+  {c:'VN',zh:'越南航空',en:'Vietnam Airlines',t:'FSC',co:'VN',site:'https://www.vietnamairlines.com/tw/zh-TW/home',status:'https://www.vietnamairlines.com/tw/zh-TW/home'},
+  {c:'VJ',zh:'越捷航空',en:'VietJet Air',t:'LCC',co:'VN',site:'https://www.vietjetair.com/zh-TW',status:'https://www.vietjetair.com/zh-TW'},
+  {c:'QH',zh:'越竹航空',en:'Bamboo Airways',t:'FSC',co:'VN',site:'https://www.bambooairways.com/',status:'https://www.bambooairways.com/'},
+  {c:'GA',zh:'嘉魯達印尼航空',en:'Garuda Indonesia',t:'FSC',co:'ID',site:'https://www.garuda-indonesia.com/',status:'https://www.garuda-indonesia.com/'},
+  // ── 中國大陸 ──
+  {c:'CA',zh:'中國國際航空',en:'Air China',t:'FSC',co:'CN',site:'https://www.airchina.com.tw/',status:'https://www.airchina.com.tw/'},
+  {c:'MU',zh:'中國東方航空',en:'China Eastern',t:'FSC',co:'CN',site:'https://tw.ceair.com/',status:'https://tw.ceair.com/'},
+  {c:'CZ',zh:'中國南方航空',en:'China Southern',t:'FSC',co:'CN',site:'https://www.csair.com/tw/',status:'https://www.csair.com/tw/'},
+  {c:'MF',zh:'廈門航空',en:'Xiamen Airlines',t:'FSC',co:'CN',site:'https://www.xiamenair.com/',status:'https://www.xiamenair.com/'},
+  {c:'3U',zh:'四川航空',en:'Sichuan Airlines',t:'FSC',co:'CN',site:'https://www.sichuanair.com/',status:'https://www.sichuanair.com/'},
+  {c:'HU',zh:'海南航空',en:'Hainan Airlines',t:'FSC',co:'CN',site:'https://www.hainanairlines.com/',status:'https://www.hainanairlines.com/'},
+  // ── 中東 ──
+  {c:'EK',zh:'阿聯酋航空',en:'Emirates',t:'FSC',co:'AE',site:'https://www.emirates.com/tw/chinese/',status:'https://www.emirates.com/tw/chinese/'},
+  {c:'QR',zh:'卡達航空',en:'Qatar Airways',t:'FSC',co:'QA',site:'https://www.qatarairways.com/zh-tw/homepage.html',status:'https://www.qatarairways.com/zh-tw/homepage.html'},
+  {c:'EY',zh:'阿提哈德航空',en:'Etihad Airways',t:'FSC',co:'AE',site:'https://www.etihad.com/',status:'https://www.etihad.com/'},
+  {c:'TK',zh:'土耳其航空',en:'Turkish Airlines',t:'FSC',co:'TR',site:'https://www.turkishairlines.com/zh-tw/',status:'https://www.turkishairlines.com/zh-tw/'},
+  // ── 美洲／大洋洲 ──
+  {c:'UA',zh:'聯合航空',en:'United Airlines',t:'FSC',co:'US',site:'https://www.united.com/zh-hant/tw',status:'https://www.united.com/zh-hant/tw'},
+  {c:'DL',zh:'達美航空',en:'Delta Air Lines',t:'FSC',co:'US',site:'https://zt.delta.com/tw/zh',status:'https://zt.delta.com/tw/zh'},
+  {c:'AA',zh:'美國航空',en:'American Airlines',t:'FSC',co:'US',site:'https://www.aa.com/',status:'https://www.aa.com/'},
+  {c:'AC',zh:'加拿大航空',en:'Air Canada',t:'FSC',co:'CA',site:'https://www.aircanada.com/tw/zh/',status:'https://www.aircanada.com/tw/zh/'},
+  {c:'QF',zh:'澳洲航空',en:'Qantas',t:'FSC',co:'AU',site:'https://www.qantas.com/tw/zh_TW.html',status:'https://www.qantas.com/tw/zh_TW.html'},
+  {c:'NZ',zh:'紐西蘭航空',en:'Air New Zealand',t:'FSC',co:'NZ',site:'https://www.airnewzealand.tw/',status:'https://www.airnewzealand.tw/'},
+  // ── 歐洲 ──
+  {c:'BA',zh:'英國航空',en:'British Airways',t:'FSC',co:'GB',site:'https://www.britishairways.com/',status:'https://www.britishairways.com/'},
+  {c:'AF',zh:'法國航空',en:'Air France',t:'FSC',co:'FR',site:'https://wwws.airfrance.com.tw/',status:'https://wwws.airfrance.com.tw/'},
+  {c:'KL',zh:'荷蘭皇家航空',en:'KLM Royal Dutch Airlines',t:'FSC',co:'NL',site:'https://www.klm.com.tw/',status:'https://www.klm.com.tw/'},
+  {c:'LH',zh:'漢莎航空',en:'Lufthansa',t:'FSC',co:'DE',site:'https://www.lufthansa.com/tw/zh',status:'https://www.lufthansa.com/tw/zh'},
+];
